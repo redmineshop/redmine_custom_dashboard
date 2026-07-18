@@ -1,0 +1,110 @@
+/* Scoped dashboard layout — keep Redmine theme colors */
+
+.custom-dashboard-period-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.custom-dashboard-period-select {
+  min-height: 44px;
+  min-width: 140px;
+  padding: 8px 12px;
+  font-size: 1em;
+}
+
+.custom-dashboard-period-range {
+  color: #555;
+  font-size: 0.95em;
+}
+
+.custom-dashboard-kpis {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+  margin: 16px 0;
+}
+
+a.custom-dashboard-kpi-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+a.custom-dashboard-kpi-link:hover,
+a.custom-dashboard-kpi-link:focus {
+  box-shadow: 0 0 0 2px rgba(41, 128, 185, 0.35);
+  outline: none;
+}
+
+.custom-dashboard-kpi {
+  text-align: center;
+  padding: 16px 12px;
+  margin: 0;
+}
+
+.custom-dashboard-kpi-value {
+  font-size: 2.25em;
+  font-weight: bold;
+  line-height: 1.2;
+}
+
+.custom-dashboard-kpi-label {
+  margin-top: 4px;
+  color: #555;
+  font-size: 0.9em;
+}
+
+.custom-dashboard-delta {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 0.85em;
+  font-weight: 600;
+}
+
+.custom-dashboard-delta-up { color: #1e7e34; }
+.custom-dashboard-delta-down { color: #c0392b; }
+
+.custom-dashboard-kpi-open { color: #2980b9; }
+.custom-dashboard-kpi-resolved { color: #27ae60; }
+.custom-dashboard-kpi-overdue { color: #e74c3c; }
+.custom-dashboard-kpi-progress { color: #f39c12; }
+.custom-dashboard-kpi-due-soon { color: #8e44ad; }
+
+.custom-dashboard-assignees .custom-dashboard-col-resolved,
+.custom-dashboard-assignees .custom-dashboard-col-progress,
+.custom-dashboard-assignees .custom-dashboard-col-overdue {
+  text-align: center;
+  width: 8em;
+}
+
+.custom-dashboard-assignees .custom-dashboard-col-resolved { color: #27ae60; font-weight: bold; }
+.custom-dashboard-assignees .custom-dashboard-col-progress { color: #f39c12; font-weight: bold; }
+.custom-dashboard-assignees .custom-dashboard-col-overdue { color: #e74c3c; font-weight: bold; }
+
+.custom-dashboard-assignees tr.unassigned td.name {
+  font-style: italic;
+  color: #555;
+}
+
+@media (max-width: 1100px) {
+  .custom-dashboard-kpis {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .custom-dashboard-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .custom-dashboard-period-form {
+    width: 100%;
+  }
+
+  .custom-dashboard-period-select {
+    flex: 1 1 auto;
+  }
+}

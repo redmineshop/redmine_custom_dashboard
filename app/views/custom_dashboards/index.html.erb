@@ -1,0 +1,106 @@
+<% html_title l('redmine_custom_dashboard.title') %>
+
+<div class="contextual">
+  <%= form_tag({ controller: 'custom_dashboards', action: 'index', project_id: @project },
+               method: :get,
+               class: 'custom-dashboard-period-form') do %>
+    <label for="period"><%= l('redmine_custom_dashboard.period_label') %></label>
+    <%= select_tag :period,
+                   options_for_select(
+                     [
+                       [l('redmine_custom_dashboard.date_range.last_7_days'), '7'],
+                       [l('redmine_custom_dashboard.date_range.last_30_days'), '30'],
+                       [l('redmine_custom_dashboard.date_range.last_90_days'), '90']
+                     ],
+                     @stats.period_key
+                   ),
+                   id: 'period',
+                   class: 'custom-dashboard-period-select',
+                   onchange: 'this.form.submit()' %>
+    <span class="custom-dashboard-period-range"><%= dashboard_date_range_label(@stats) %></span>
+    <noscript><%= submit_tag l('redmine_custom_dashboard.apply') %></noscript>
+  <% end %>
+</div>
+
+<h2><%= l('redmine_custom_dashboard.title') %></h2>
+
+<div class="custom-dashboard-kpis">
+  <%= link_to dashboard_issues_path(@project, @stats.issue_filters[:open]),
+              class: 'box custom-dashboard-kpi custom-dashboard-kpi-link',
+              title: l('redmine_custom_dashboard.kpi_open_hint') do %>
+    <div class="custom-dashboard-kpi-value custom-dashboard-kpi-open"><%= @stats.open %></div>
+    <div class="custom-dashboard-kpi-label"><%= l('redmine_custom_dashboard.kpi_open') %></div>
+    <%= dashboard_kpi_delta(@stats.delta_open) %>
+  <% end %>
+
+  <%= link_to dashboard_issues_path(@project, @stats.issue_filters[:resolved]),
+              class: 'box custom-dashboard-kpi custom-dashboard-kpi-link',
+              title: l('redmine_custom_dashboard.kpi_resolved_hint') do %>
+    <div class="custom-dashboard-kpi-value custom-dashboard-kpi-resolved"><%= @stats.resolved_in_period %></div>
+    <div class="custom-dashboard-kpi-label"><%= l('redmine_custom_dashboard.kpi_resolved') %></div>
+    <%= dashboard_kpi_delta(@stats.delta_resolved) %>
+  <% end %>
+
+  <%= link_to dashboard_issues_path(@project, @stats.issue_filters[:overdue]),
+              class: 'box custom-dashboard-kpi custom-dashboard-kpi-link',
+              title: l('redmine_custom_dashboard.kpi_overdue_hint') do %>
+    <div class="custom-dashboard-kpi-value custom-dashboard-kpi-overdue"><%= @stats.overdue %></div>
+    <div class="custom-dashboard-kpi-label"><%= l('redmine_custom_dashboard.kpi_overdue') %></div>
+    <%= dashboard_kpi_delta(@stats.delta_overdue) %>
+  <% end %>
+
+  <%= link_to dashboard_issues_path(@project, @stats.issue_filters[:in_progress]),
+              class: 'box custom-dashboard-kpi custom-dashboard-kpi-link',
+              title: l('redmine_custom_dashboard.kpi_in_progress_hint') do %>
+    <div class="custom-dashboard-kpi-value custom-dashboard-kpi-progress"><%= @stats.in_progress %></div>
+    <div class="custom-dashboard-kpi-label"><%= l('redmine_custom_dashboard.kpi_in_progress') %></div>
+    <%= dashboard_kpi_delta(@stats.delta_in_progress) %>
+  <% end %>
+
+  <%= link_to dashboard_issues_path(@project, @stats.issue_filters[:due_soon]),
+              class: 'box custom-dashboard-kpi custom-dashboard-kpi-link',
+              title: l('redmine_custom_dashboard.kpi_due_soon_hint') do %>
+    <div class="custom-dashboard-kpi-value custom-dashboard-kpi-due-soon"><%= @stats.due_soon %></div>
+    <div class="custom-dashboard-kpi-label"><%= l('redmine_custom_dashboard.kpi_due_soon') %></div>
+    <%= dashboard_kpi_delta(@stats.delta_due_soon) %>
+  <% end %>
+</div>
+
+<h3><%= l('redmine_custom_dashboard.assignee_breakdown') %></h3>
+
+<% if @stats.assignee_stats.empty? %>
+  <p class="nodata"><%= l('redmine_custom_dashboard.no_assignees') %></p>
+<% else %>
+  <div class="autoscroll">
+    <table class="list custom-dashboard-assignees">
+      <thead>
+        <tr>
+          <th><%= l('redmine_custom_dashboard.table.assignee') %></th>
+          <th class="custom-dashboard-col-resolved" title="<%= l('redmine_custom_dashboard.table.resolved') %>">
+            <%= l('redmine_custom_dashboard.table.resolved') %>
+          </th>
+          <th class="custom-dashboard-col-progress" title="<%= l('redmine_custom_dashboard.table.in_progress') %>">
+            <%= l('redmine_custom_dashboard.table.in_progress') %>
+          </th>
+          <th class="custom-dashboard-col-overdue" title="<%= l('redmine_custom_dashboard.table.overdue') %>">
+            <%= l('redmine_custom_dashboard.table.overdue') %>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @stats.assignee_stats.each do |row| %>
+          <tr class="<%= cycle('odd', 'even') %><%= ' unassigned' if row[:unassigned] %>">
+            <td class="name"><%= dashboard_assignee_cell(row) %></td>
+            <td class="custom-dashboard-col-resolved"><%= row[:resolved] %></td>
+            <td class="custom-dashboard-col-progress"><%= row[:in_progress] %></td>
+            <td class="custom-dashboard-col-overdue"><%= row[:overdue] %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% end %>
+
+<% content_for :header_tags do %>
+  <%= stylesheet_link_tag 'custom_dashboard', plugin: 'redmine_custom_dashboard' %>
+<% end %>

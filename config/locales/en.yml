@@ -1,0 +1,32 @@
+en:
+  label_custom_dashboard: Dashboard
+  project_module_custom_dashboard: Custom Dashboard
+  permission_view_custom_dashboard: View custom dashboard
+  redmine_custom_dashboard:
+    title: Project Dashboard
+    period_label: Period
+    date_range_span: "%{from} – %{to}"
+    delta_hint: Change vs previous period / period start
+    kpi_open: Open issues
+    kpi_resolved: Resolved (period)
+    kpi_overdue: Overdue
+    kpi_in_progress: In progress
+    kpi_due_soon: Due soon (7d)
+    kpi_open_hint: View open issues
+    kpi_resolved_hint: View issues closed in this period
+    kpi_overdue_hint: View overdue open issues
+    kpi_in_progress_hint: View in-progress issues
+    kpi_due_soon_hint: View open issues due in the next 7 days
+    assignee_breakdown: Team throughput — assignee breakdown
+    table:
+      assignee: Assignee
+      resolved: Resolved
+      in_progress: In progress
+      overdue: Overdue
+    unassigned: Unassigned
+    no_assignees: No assigned issues in this period.
+    date_range:
+      last_7_days: Last 7 days
+      last_30_days: Last 30 days
+      last_90_days: Last 90 days
+    apply: Apply

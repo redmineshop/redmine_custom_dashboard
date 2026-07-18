@@ -1,0 +1,32 @@
+vi:
+  label_custom_dashboard: Bảng điều khiển
+  project_module_custom_dashboard: Bảng điều khiển tùy chỉnh
+  permission_view_custom_dashboard: Xem bảng điều khiển tùy chỉnh
+  redmine_custom_dashboard:
+    title: Bảng điều khiển dự án
+    period_label: Kỳ
+    date_range_span: "%{from} – %{to}"
+    delta_hint: Thay đổi so với kỳ trước / đầu kỳ
+    kpi_open: Issue đang mở
+    kpi_resolved: Đã giải quyết (kỳ)
+    kpi_overdue: Quá hạn
+    kpi_in_progress: Đang làm
+    kpi_due_soon: Sắp đến hạn (7 ngày)
+    kpi_open_hint: Xem các issue đang mở
+    kpi_resolved_hint: Xem issue đóng trong kỳ này
+    kpi_overdue_hint: Xem issue quá hạn
+    kpi_in_progress_hint: Xem issue đang làm
+    kpi_due_soon_hint: Xem issue sắp đến hạn trong 7 ngày
+    assignee_breakdown: Năng suất nhóm — theo người được giao
+    table:
+      assignee: Người được giao
+      resolved: Đã giải quyết
+      in_progress: Đang làm
+      overdue: Quá hạn
+    unassigned: Chưa giao
+    no_assignees: Không có issue được giao trong kỳ này.
+    date_range:
+      last_7_days: 7 ngày qua
+      last_30_days: 30 ngày qua
+      last_90_days: 90 ngày qua
+    apply: Áp dụng

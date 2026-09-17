@@ -2,6 +2,21 @@
 
 All notable changes to this plugin.
 
+## [Unreleased]
+
+### Changed
+
+- Community install is **GitHub-first** (`git clone https://github.com/redmineshop/redmine_custom_dashboard.git`). Email-funnel packages are no longer the documented download path.
+- README: **Last maintained** date, honest compatibility (untested matrix cells), and verified vs declared quality-harness table. No product-page download CTA.
+
+### Added
+
+- Plugin quality harness on the RedmineShop demo stack: Playwright E2E for the project Dashboard tab, KPI cards, period filter, and overdue drill-down, plus README screenshots.
+
+### Notes
+
+- Do not treat the harness as a Redmine 5.1 / 6.x matrix.
+
 ## [1.1.0] — 2026-07-18
 
 UX polish and operational drill-down (Community).

@@ -7,7 +7,7 @@ All notable changes to this plugin.
 ### Changed
 
 - Community install is **GitHub-first** (`git clone https://github.com/redmineshop/redmine_custom_dashboard.git`). Email-funnel packages are no longer the documented download path.
-- README: **Last maintained** 2026-09-18, embed all five harness screenshots, honest compatibility (untested matrix cells), and public-safe harness wording (no clickable private-monorepo URLs). No product-page download CTA.
+- README: Last maintained date, screenshots, and untested compatibility cells. Install path is GitHub clone.
 
 ### Added
 

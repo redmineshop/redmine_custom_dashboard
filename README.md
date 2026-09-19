@@ -2,8 +2,9 @@
 
 [![Community · Free forever](https://img.shields.io/badge/Community-Free%20forever-brightgreen)](https://redmineshop.com/products/redmine-custom-dashboard)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
+[![CI](https://github.com/redmineshop/redmine_custom_dashboard/actions/workflows/ci.yml/badge.svg)](https://github.com/redmineshop/redmine_custom_dashboard/actions/workflows/ci.yml)
 
-**Last maintained:** 2026-09-17
+**Last maintained:** 2026-09-18
 
 **Source on GitHub:** [github.com/redmineshop/redmine_custom_dashboard](https://github.com/redmineshop/redmine_custom_dashboard)
 
@@ -81,13 +82,19 @@ The plugin declares `requires_redmine version_or_higher: '5.0'`. Do not treat ca
 
 ## Screenshot
 
-Project Dashboard on demo Redmine (plugin quality harness):
+Project Dashboard, KPI cards, assignee breakdown, overdue drill-down, and the plugin row (demo Redmine):
 
 ![Project Dashboard with KPI cards and assignee table](screenshots/dashboard-overview.png)
 
-KPI cards, assignee breakdown, overdue drill-down, and plugin row: [screenshots/kpi-cards.png](screenshots/kpi-cards.png), [screenshots/assignee-breakdown.png](screenshots/assignee-breakdown.png), [screenshots/kpi-drilldown-overdue.png](screenshots/kpi-drilldown-overdue.png), [screenshots/admin-plugins.png](screenshots/admin-plugins.png).
+![KPI cards](screenshots/kpi-cards.png)
 
-Refresh from the RedmineShop monorepo: `./demo/scripts/run-plugin-e2e.sh`.
+![Assignee breakdown](screenshots/assignee-breakdown.png)
+
+![Overdue KPI drill-down](screenshots/kpi-drilldown-overdue.png)
+
+![Plugin listed under Administration → Plugins](screenshots/admin-plugins.png)
+
+Screenshot refresh lives in the private `redmineshop/redmineshop` harness. A public clone cannot run it.
 
 ## Tests
 
@@ -97,7 +104,7 @@ Unit + functional tests live under `test/` (MiniTest):
 bundle exec rake redmine:plugins:test NAME=redmine_custom_dashboard RAILS_ENV=test
 ```
 
-On the RedmineShop demo stack:
+On the private `redmineshop/redmineshop` demo stack (not this public clone):
 
 ```bash
 PLUGIN_NAME=redmine_custom_dashboard ./demo/scripts/run-sso-plugin-tests.sh
@@ -107,17 +114,17 @@ Public sibling CI (`.github/workflows/ci.yml`) is Ruby syntax only (`ruby -c`). 
 
 ### Quality harness (demo + E2E)
 
-The quality harness lives on the RedmineShop **monorepo** demo stack (`docker-compose.demo.yml`). This public GitHub repo is the plugin only — it does not ship that compose file.
+E2E lives in the **private** `redmineshop/redmineshop` harness (`docker-compose.demo.yml` + Playwright). This public GitHub repo is the plugin only — it does not ship that compose file, and a public clone cannot open private harness docs.
+
+Install and smoke this plugin on your own Redmine: [custom dashboard install](https://redmineshop.com/docs/custom-dashboard-install).
 
 | Bar | Status |
 | --- | --- |
 | Automated tests beyond `ruby -c` | **Verified** — `test/unit` + `test/functional` in this repo (Playwright is a separate row) |
-| Installed + enabled on demo Redmine | **Verified** — mounted via `demo/plugins/` on the monorepo demo stack; seed enables the module, grants `view_custom_dashboard`, and seeds KPI issues on `plugin-qa` |
-| E2E primary happy path | **Verified** — Playwright `demo/e2e/tests/redmine_custom_dashboard.spec.js` (Dashboard tab, KPI cards, 7 vs 30 day period, overdue drill-down) |
+| Installed + enabled on demo Redmine | **Verified** — mounted via `demo/plugins/` on the private monorepo demo stack; seed enables the module, grants `view_custom_dashboard`, and seeds KPI issues on `plugin-qa` |
+| E2E primary happy path | **Verified** — Playwright on that private harness (Dashboard tab, KPI cards, 7 vs 30 day period, overdue drill-down) |
 | UI screenshot in README | **Verified** — `screenshots/{admin-plugins,dashboard-overview,kpi-cards,assignee-breakdown,kpi-drilldown-overdue}.png` from that spec |
 | Redmine 5.1 / 6.x matrix | **Declared / untested** — this harness is one demo image, not a QA matrix |
-
-How to run (monorepo, not this public repo): [plugin quality harness](https://github.com/redmineshop/redmineshop/blob/main/docs/plugin-quality-harness.md).
 
 ## Community support
 

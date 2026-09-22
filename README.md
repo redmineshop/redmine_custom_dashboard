@@ -82,15 +82,13 @@ The plugin declares `requires_redmine version_or_higher: '5.0'`. Do not treat ca
 
 ## Screenshot
 
-Project Dashboard, KPI cards, assignee breakdown, overdue drill-down, and the plugin row (demo Redmine):
+Project → Dashboard on demo Redmine. The KPI cards (including Due soon) sit in the project page with the top menu and project tabs. The assignee table on that page includes Unassigned.
 
-![Project Dashboard with KPI cards and assignee table](screenshots/dashboard-overview.png)
+![Project dashboard with KPI cards](screenshots/kpi-cards.png)
 
-![KPI cards](screenshots/kpi-cards.png)
+The Overdue card opens the filtered issue list:
 
-![Assignee breakdown](screenshots/assignee-breakdown.png)
-
-![Overdue KPI drill-down](screenshots/kpi-drilldown-overdue.png)
+![Overdue KPI drill-down](screenshots/kpi-drilldown.png)
 
 ![Plugin listed under Administration → Plugins](screenshots/admin-plugins.png)
 
@@ -123,7 +121,7 @@ Install and smoke this plugin on your own Redmine: [custom dashboard install](ht
 | Automated tests beyond `ruby -c` | **Verified** — `test/unit` + `test/functional` in this repo (Playwright is a separate row) |
 | Installed + enabled on demo Redmine | **Verified** — mounted via `demo/plugins/` on the private monorepo demo stack; seed enables the module, grants `view_custom_dashboard`, and seeds KPI issues on `plugin-qa` |
 | E2E primary happy path | **Verified** — Playwright on that private harness (Dashboard tab, KPI cards, 7 vs 30 day period, overdue drill-down) |
-| UI screenshot in README | **Verified** — `screenshots/{admin-plugins,dashboard-overview,kpi-cards,assignee-breakdown,kpi-drilldown-overdue}.png` from that spec |
+| UI screenshot in README | **Verified** — `screenshots/{kpi-cards,kpi-drilldown,admin-plugins}.png` from that spec (full Redmine pages). `dashboard-overview.png`, `assignee-breakdown.png`, and `kpi-drilldown-overdue.png` are the same images under the older names. |
 | Redmine 5.1 / 6.x matrix | **Declared / untested** — this harness is one demo image, not a QA matrix |
 
 ## Community support

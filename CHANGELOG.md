@@ -8,6 +8,9 @@ All notable changes to this plugin.
 
 - Community install is **GitHub-first** (`git clone https://github.com/redmineshop/redmine_custom_dashboard.git`). Email-funnel packages are no longer the documented download path.
 - README: Last maintained date, screenshots, and untested compatibility cells. Install path is GitHub clone.
+- In-progress KPI matches open statuses whose name is Redmine's default in-progress label (English `In Progress`, Vietnamese `Đang thực hiện`, plus `default_issue_status_in_progress` from installed locales), compared case-insensitively. A closed status with that name is not counted.
+- Period query values outside `7`, `30`, and `90` still fall back to 30 days. Surrounding whitespace is ignored.
+- Resolved and overdue counts use bound ActiveRecord predicates (no string SQL).
 
 ### Added
 

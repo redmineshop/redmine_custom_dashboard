@@ -12,6 +12,13 @@ module RedmineCustomDashboard
     DEFAULT_PERIOD = '30'
     DUE_SOON_DAYS = 7
 
+    # English and Vietnamese default seeds. Other locales come from
+    # I18n `default_issue_status_in_progress` when Redmine has that locale loaded.
+    CANONICAL_IN_PROGRESS_NAMES = [
+      'In Progress',
+      'Đang thực hiện'
+    ].freeze
+
     Result = Struct.new(
       :period_key, :period_days, :from_date, :to_date,
       :open, :resolved_in_period, :overdue, :in_progress, :due_soon,
@@ -21,8 +28,25 @@ module RedmineCustomDashboard
     )
 
     def self.normalize_period(period)
-      key = period.to_s
+      key = period.to_s.strip
       PERIODS.key?(key) ? key : DEFAULT_PERIOD
+    end
+
+    # Case-fold status labels in Ruby so matching does not depend on DB collation.
+    def self.normalize_status_label(name)
+      name.to_s.strip.downcase
+    end
+
+    def self.in_progress_labels(extra_labels = [])
+      (CANONICAL_IN_PROGRESS_NAMES + Array(extra_labels)).filter_map do |label|
+        normalized = normalize_status_label(label)
+        normalized unless normalized.empty?
+      end.uniq
+    end
+
+    def self.in_progress_label?(name, labels)
+      normalized = normalize_status_label(name)
+      !normalized.empty? && labels.include?(normalized)
     end
 
     def initialize(project, period: DEFAULT_PERIOD, today: Date.current)
@@ -36,7 +60,8 @@ module RedmineCustomDashboard
 
     def call
       current = raw_kpis
-      # Stock KPIs at period start (recompute with "today" = from_date).
+      # Date-based stock (overdue, due soon) is recomputed with today = period start.
+      # Open and in-progress ignore @today, so those deltas stay 0 (no journal replay).
       baseline = self.class.new(@project, period: @period_key, today: @from_date).raw_kpis
 
       Result.new(
@@ -85,29 +110,53 @@ module RedmineCustomDashboard
     end
 
     def in_progress_status_ids
-      @in_progress_status_ids ||= IssueStatus.where(name: ['In Progress', 'Đang thực hiện']).pluck(:id)
+      @in_progress_status_ids ||= begin
+        labels = self.class.in_progress_labels(i18n_in_progress_labels)
+        IssueStatus.where(is_closed: false).select do |status|
+          self.class.in_progress_label?(status.name, labels)
+        end.map(&:id)
+      end
+    end
+
+    def i18n_in_progress_labels
+      return [] unless defined?(I18n)
+
+      I18n.available_locales.filter_map do |locale|
+        label = I18n.t(:default_issue_status_in_progress, locale: locale, default: '')
+        next unless label.is_a?(String)
+        next if label.empty? || label == 'default_issue_status_in_progress'
+        next if label.include?('translation missing')
+
+        label
+      end
+    end
+
+    def resolved_timestamp
+      Arel::Nodes::NamedFunction.new(
+        'COALESCE',
+        [Issue.arel_table[:closed_on], Issue.arel_table[:updated_on]]
+      )
     end
 
     def resolved_between_scope(from_date, to_date_exclusive)
       from_time = from_date.beginning_of_day
       to_time = to_date_exclusive.beginning_of_day
+      stamp = resolved_timestamp
       base_scope
         .where(status_id: closed_statuses.select(:id))
-        .where(
-          'COALESCE(closed_on, updated_on) >= ? AND COALESCE(closed_on, updated_on) < ?',
-          from_time, to_time
-        )
+        .where(stamp.gteq(from_time))
+        .where(stamp.lt(to_time))
     end
 
     def resolved_in_period_scope
-      from_time = @from_date.beginning_of_day
+      stamp = resolved_timestamp
       base_scope
         .where(status_id: closed_statuses.select(:id))
-        .where('COALESCE(closed_on, updated_on) >= ?', from_time)
+        .where(stamp.gteq(@from_date.beginning_of_day))
     end
 
     def overdue_scope
-      open_scope.where('due_date IS NOT NULL AND due_date < ?', @today)
+      open_scope.where.not(due_date: nil).where(Issue.arel_table[:due_date].lt(@today))
     end
 
     def in_progress_scope

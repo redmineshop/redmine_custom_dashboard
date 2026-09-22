@@ -4,7 +4,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
 [![CI](https://github.com/redmineshop/redmine_custom_dashboard/actions/workflows/ci.yml/badge.svg)](https://github.com/redmineshop/redmine_custom_dashboard/actions/workflows/ci.yml)
 
-**Last maintained:** 2026-09-18
+**Last maintained:** 2026-09-23
 
 **Source on GitHub:** [github.com/redmineshop/redmine_custom_dashboard](https://github.com/redmineshop/redmine_custom_dashboard)
 
@@ -16,6 +16,7 @@ Community edition is **free forever** — no license key, no phone-home, **no em
 
 - Per-project **Dashboard** tab (enable the module on each project)
 - KPI cards from live issue data: open / resolved (period) / overdue / in progress / due soon (7d)
+- In progress counts open issues whose status name matches Redmine's default in-progress label: `In Progress`, `Đang thực hiện`, and `default_issue_status_in_progress` from locales installed with Redmine (case-insensitive). A custom status name that does not match those labels is not counted. A closed status is not counted.
 - Click a KPI to open the matching filtered issues list
 - Delta vs previous period (resolved) or period start (stock KPIs)
 - Period filter: last 7, 30, or 90 days + visible date range
@@ -74,11 +75,12 @@ Remove the plugin folder and restart Redmine. No `plugins:migrate VERSION=0` ste
 
 | Redmine | Ruby | Database | Status |
 |---------|------|----------|--------|
+| 7.0.1   | 4.0.7 | MySQL 8.0.46 | Exercised once on the demo harness (MiniTest + Playwright happy path, 2026-09-23). PostgreSQL was not run. Not a matrix. |
 | 6.x     | 3.2+ | MySQL 8 / PostgreSQL | Targeted — **untested** (no published QA matrix) |
 | 5.1.x   | 3.1+ | MySQL 8 / PostgreSQL | Targeted — **untested** |
 | 5.0.x   | 3.0+ | MySQL 8 / PostgreSQL | Targeted — **untested** |
 
-The plugin declares `requires_redmine version_or_higher: '5.0'`. Do not treat catalog versions as tested cells. The demo quality harness is **one** Redmine image, not a 5.1 / 6.x matrix.
+The plugin declares `requires_redmine version_or_higher: '5.0'`. Do not treat catalog versions as tested cells. The demo quality harness is **one** Redmine image (7.0.1 on 2026-09-23), not a 5.1 / 6.x / 7.x matrix.
 
 ## Screenshot
 
@@ -108,7 +110,7 @@ On the private `redmineshop/redmineshop` demo stack (not this public clone):
 PLUGIN_NAME=redmine_custom_dashboard ./demo/scripts/run-sso-plugin-tests.sh
 ```
 
-Public sibling CI (`.github/workflows/ci.yml`) is Ruby syntax only (`ruby -c`). That is not the quality bar.
+Public sibling CI (`.github/workflows/ci.yml`) runs Ruby syntax (`ruby -c`) and `test/standalone/dashboard_stats_standalone_test.rb` (period whitelist and in-progress label matching). It does not boot Redmine. That is not the MiniTest or Playwright bar.
 
 ### Quality harness (demo + E2E)
 
@@ -122,7 +124,7 @@ Install and smoke this plugin on your own Redmine: [custom dashboard install](ht
 | Installed + enabled on demo Redmine | **Verified** — mounted via `demo/plugins/` on the private monorepo demo stack; seed enables the module, grants `view_custom_dashboard`, and seeds KPI issues on `plugin-qa` |
 | E2E primary happy path | **Verified** — Playwright on that private harness (Dashboard tab, KPI cards, 7 vs 30 day period, overdue drill-down) |
 | UI screenshot in README | **Verified** — `screenshots/{kpi-cards,kpi-drilldown,admin-plugins}.png` from that spec (full Redmine pages). `dashboard-overview.png`, `assignee-breakdown.png`, and `kpi-drilldown-overdue.png` are the same images under the older names. |
-| Redmine 5.1 / 6.x matrix | **Declared / untested** — this harness is one demo image, not a QA matrix |
+| Redmine 5.1 / 6.x matrix | **Declared / untested** — demo harness on 2026-09-23 was Redmine 7.0.1 + MySQL 8.0.46 only, not a QA matrix |
 
 ## Community support
 

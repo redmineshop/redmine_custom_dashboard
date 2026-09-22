@@ -50,4 +50,21 @@ class CustomDashboardsControllerTest < Redmine::ControllerTest
     assert_response :success
     assert_select 'select#period option[selected][value=?]', '30'
   end
+
+  def test_index_period_90_and_stripped_period
+    @request.session[:user_id] = 2
+    get :index, params: { project_id: @project.id, period: '90' }
+    assert_response :success
+    assert_select 'select#period option[selected][value=?]', '90'
+
+    get :index, params: { project_id: @project.id, period: ' 7 ' }
+    assert_response :success
+    assert_select 'select#period option[selected][value=?]', '7'
+  end
+
+  def test_index_requires_login
+    @request.session[:user_id] = nil
+    get :index, params: { project_id: @project.id }
+    assert_response :redirect
+  end
 end

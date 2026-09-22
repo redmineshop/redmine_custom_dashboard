@@ -4,13 +4,15 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
 [![CI](https://github.com/redmineshop/redmine_custom_dashboard/actions/workflows/ci.yml/badge.svg)](https://github.com/redmineshop/redmine_custom_dashboard/actions/workflows/ci.yml)
 
-**Last maintained:** 2026-09-18
+**Last maintained:** 2026-09-22
 
 **Source on GitHub:** [github.com/redmineshop/redmine_custom_dashboard](https://github.com/redmineshop/redmine_custom_dashboard)
 
+Live project KPIs for Redmine.
+
 Employee performance dashboard for Redmine — KPI cards and assignee throughput per project, with a date-range filter. Built for team leads who need a quick view without exporting spreadsheets.
 
-Community edition is **free forever** — no license key, no phone-home, **no email to clone**.
+Community edition is free — no license key and no phone-home. Clone from this repository.
 
 ## Features
 
@@ -64,7 +66,7 @@ No extra gems. See the [install guide](https://redmineshop.com/docs/custom-dashb
 1. **Administration → Roles and permissions** — grant **View custom dashboard**
 2. Per project: **Settings → Modules → Custom Dashboard**
 
-There is no Administration → Plugins → Configure screen.
+There is no Administration → Plugins → Configure screen. After restart, **Administration → Plugins** lists **Redmine Custom Dashboard**.
 
 ## Uninstall
 
@@ -72,13 +74,15 @@ Remove the plugin folder and restart Redmine. No `plugins:migrate VERSION=0` ste
 
 ## Compatibility
 
-| Redmine | Ruby | Database | Status |
-|---------|------|----------|--------|
-| 6.x     | 3.2+ | MySQL 8 / PostgreSQL | Targeted — **untested** (no published QA matrix) |
-| 5.1.x   | 3.1+ | MySQL 8 / PostgreSQL | Targeted — **untested** |
-| 5.0.x   | 3.0+ | MySQL 8 / PostgreSQL | Targeted — **untested** |
+Declared follows `requires_redmine version_or_higher: '5.0'` for 5.x and 6.x. Redmine 7.0 is not a claimed target. Tested means a run pinned to that Redmine line. The demo image is official `redmine:latest` (tag not pinned), so a demo boot is not a pass for a specific row.
 
-The plugin declares `requires_redmine version_or_higher: '5.0'`. Do not treat catalog versions as tested cells. The demo quality harness is **one** Redmine image, not a 5.1 / 6.x matrix.
+| Redmine | Declared | Tested |
+|---------|----------|--------|
+| 5.0.x   | Yes      | No — unverified |
+| 5.1.x   | Yes      | No — unverified |
+| 6.0.x   | Yes      | No — unverified |
+| 6.1.x   | Yes      | No — unverified |
+| 7.0.x   | No       | No — unverified |
 
 ## Screenshot
 
@@ -94,7 +98,7 @@ Project Dashboard, KPI cards, assignee breakdown, overdue drill-down, and the pl
 
 ![Plugin listed under Administration → Plugins](screenshots/admin-plugins.png)
 
-Screenshot refresh lives in the private `redmineshop/redmineshop` harness. A public clone cannot run it.
+Images are crops from a demo Redmine. The Redmine version in the capture was not recorded. `kpi-cards.png` is a short crop of the cards. A full-page screenshot is still TODO.
 
 ## Tests
 
@@ -104,27 +108,14 @@ Unit + functional tests live under `test/` (MiniTest):
 bundle exec rake redmine:plugins:test NAME=redmine_custom_dashboard RAILS_ENV=test
 ```
 
-On the private `redmineshop/redmineshop` demo stack (not this public clone):
+Public GitHub Actions (`.github/workflows/ci.yml`) runs Ruby syntax checks only (`ruby -c`).
 
-```bash
-PLUGIN_NAME=redmine_custom_dashboard ./demo/scripts/run-sso-plugin-tests.sh
-```
+## Limits
 
-Public sibling CI (`.github/workflows/ci.yml`) is Ruby syntax only (`ruby -c`). That is not the quality bar.
-
-### Quality harness (demo + E2E)
-
-E2E lives in the **private** `redmineshop/redmineshop` harness (`docker-compose.demo.yml` + Playwright). This public GitHub repo is the plugin only — it does not ship that compose file, and a public clone cannot open private harness docs.
-
-Install and smoke this plugin on your own Redmine: [custom dashboard install](https://redmineshop.com/docs/custom-dashboard-install).
-
-| Bar | Status |
-| --- | --- |
-| Automated tests beyond `ruby -c` | **Verified** — `test/unit` + `test/functional` in this repo (Playwright is a separate row) |
-| Installed + enabled on demo Redmine | **Verified** — mounted via `demo/plugins/` on the private monorepo demo stack; seed enables the module, grants `view_custom_dashboard`, and seeds KPI issues on `plugin-qa` |
-| E2E primary happy path | **Verified** — Playwright on that private harness (Dashboard tab, KPI cards, 7 vs 30 day period, overdue drill-down) |
-| UI screenshot in README | **Verified** — `screenshots/{admin-plugins,dashboard-overview,kpi-cards,assignee-breakdown,kpi-drilldown-overdue}.png` from that spec |
-| Redmine 5.1 / 6.x matrix | **Declared / untested** — this harness is one demo image, not a QA matrix |
+- One project at a time. There is no cross-project or administration-wide dashboard.
+- No database tables and no **Administration → Plugins → Configure** screen. Enable the module per project and grant **View custom dashboard**.
+- MiniTest does not boot Redmine 5.0, 5.1, 6.0, 6.1, or 7.0.
+- Install notes: [custom dashboard install](https://redmineshop.com/docs/custom-dashboard-install).
 
 ## Community support
 

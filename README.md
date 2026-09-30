@@ -4,7 +4,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
 [![CI](https://github.com/redmineshop/redmine_custom_dashboard/actions/workflows/ci.yml/badge.svg)](https://github.com/redmineshop/redmine_custom_dashboard/actions/workflows/ci.yml)
 
-**Last maintained:** 2026-09-23
+**Last maintained:** 2026-09-30
 
 **Source on GitHub:** [github.com/redmineshop/redmine_custom_dashboard](https://github.com/redmineshop/redmine_custom_dashboard)
 
@@ -75,12 +75,12 @@ Remove the plugin folder and restart Redmine. No `plugins:migrate VERSION=0` ste
 
 | Redmine | Ruby | Database | Status |
 |---------|------|----------|--------|
-| 7.0.1   | 4.0.7 | MySQL 8.0.46 | Exercised once on the demo harness (MiniTest + Playwright happy path, 2026-09-23). PostgreSQL was not run. Not a matrix. |
+| 7.0.1   | 4.0.7 | MySQL 8.0.46 | MiniTest on the demo harness (2026-09-30). Playwright happy path last run 2026-09-23. PostgreSQL was not run. Not a matrix. |
 | 6.x     | 3.2+ | MySQL 8 / PostgreSQL | Targeted — **untested** (no published QA matrix) |
 | 5.1.x   | 3.1+ | MySQL 8 / PostgreSQL | Targeted — **untested** |
 | 5.0.x   | 3.0+ | MySQL 8 / PostgreSQL | Targeted — **untested** |
 
-The plugin declares `requires_redmine version_or_higher: '5.0'`. Do not treat catalog versions as tested cells. The demo quality harness is **one** Redmine image (7.0.1 on 2026-09-23), not a 5.1 / 6.x / 7.x matrix.
+The plugin declares `requires_redmine version_or_higher: '5.0'`. Do not treat catalog versions as tested cells. The demo quality harness is **one** Redmine image (7.0.1, Ruby 4.0.7, MySQL 8.0.46). MiniTest ran on 2026-09-30. Playwright last ran on 2026-09-23. Not a 5.1 / 6.x / 7.x matrix.
 
 ## Screenshot
 
@@ -110,7 +110,7 @@ On the private `redmineshop/redmineshop` demo stack (not this public clone):
 PLUGIN_NAME=redmine_custom_dashboard ./demo/scripts/run-sso-plugin-tests.sh
 ```
 
-Public sibling CI (`.github/workflows/ci.yml`) runs Ruby syntax (`ruby -c`) and `test/standalone/dashboard_stats_standalone_test.rb` (period whitelist and in-progress label matching). It does not boot Redmine. That is not the MiniTest or Playwright bar.
+Public CI (`.github/workflows/ci.yml`) runs Ruby syntax (`ruby -c`) and `test/standalone/dashboard_stats_standalone_test.rb` (period whitelist and in-progress label matching) on Ruby 3.2 and 3.3. It does not boot Redmine. That is not the MiniTest or Playwright bar.
 
 ### Quality harness (demo + E2E)
 
@@ -124,7 +124,7 @@ Install and smoke this plugin on your own Redmine: [custom dashboard install](ht
 | Installed + enabled on demo Redmine | **Verified** — mounted via `demo/plugins/` on the private monorepo demo stack; seed enables the module, grants `view_custom_dashboard`, and seeds KPI issues on `plugin-qa` |
 | E2E primary happy path | **Verified** — Playwright on that private harness (Dashboard tab, KPI cards, 7 vs 30 day period, overdue drill-down) |
 | UI screenshot in README | **Verified** — `screenshots/{kpi-cards,kpi-drilldown,admin-plugins}.png` from that spec (full Redmine pages). `dashboard-overview.png`, `assignee-breakdown.png`, and `kpi-drilldown-overdue.png` are the same images under the older names. |
-| Redmine 5.1 / 6.x matrix | **Declared / untested** — demo harness on 2026-09-23 was Redmine 7.0.1 + MySQL 8.0.46 only, not a QA matrix |
+| Redmine 5.1 / 6.x matrix | **Declared / untested** — demo harness on 2026-09-30 was Redmine 7.0.1 + Ruby 4.0.7 + MySQL 8.0.46 only, not a QA matrix |
 
 ## Community support
 

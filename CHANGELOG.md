@@ -6,6 +6,7 @@ All notable changes to this plugin.
 
 ### Changed
 
+- Public CI runs `ruby -c` and the standalone period/label checks on Ruby 3.2 and 3.3. It still does not boot Redmine.
 - Community install is **GitHub-first** (`git clone https://github.com/redmineshop/redmine_custom_dashboard.git`). Email-funnel packages are no longer the documented download path.
 - README: Last maintained date, screenshots, and untested compatibility cells. Install path is GitHub clone.
 - In-progress KPI matches open statuses whose name is Redmine's default in-progress label (English `In Progress`, Vietnamese `Đang thực hiện`, plus `default_issue_status_in_progress` from installed locales), compared case-insensitively. A closed status with that name is not counted.

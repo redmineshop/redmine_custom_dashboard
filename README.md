@@ -4,7 +4,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
 [![CI](https://github.com/redmineshop/redmine_custom_dashboard/actions/workflows/ci.yml/badge.svg)](https://github.com/redmineshop/redmine_custom_dashboard/actions/workflows/ci.yml)
 
-**Last maintained:** 2026-09-30
+**Last maintained:** 2026-10-06
 
 **Source on GitHub:** [github.com/redmineshop/redmine_custom_dashboard](https://github.com/redmineshop/redmine_custom_dashboard)
 
@@ -27,9 +27,9 @@ Community edition is **free forever** — no license key, no phone-home, **no em
 
 ## Requirements
 
-- Redmine 5.0.x or 6.x (`requires_redmine version_or_higher: '5.0'`)
-- Ruby 3.0+
-- MySQL 8 or PostgreSQL
+- Redmine 5.0 or newer (`requires_redmine version_or_higher: '5.0'`). Public CI runs Redmine 7.0.1
+- Ruby 3.0+ is declared. Public CI uses Ruby 3.2
+- MySQL 8 or PostgreSQL. Public CI uses MySQL 8.0. PostgreSQL was not run
 
 ## Installation
 
@@ -75,12 +75,12 @@ Remove the plugin folder and restart Redmine. No `plugins:migrate VERSION=0` ste
 
 | Redmine | Ruby | Database | Status |
 |---------|------|----------|--------|
-| 7.0.1   | 4.0.7 | MySQL 8.0.46 | MiniTest on the demo harness (2026-09-30). Playwright happy path last run 2026-09-23. PostgreSQL was not run. Not a matrix. |
-| 6.x     | 3.2+ | MySQL 8 / PostgreSQL | Targeted — **untested** (no published QA matrix) |
-| 5.1.x   | 3.1+ | MySQL 8 / PostgreSQL | Targeted — **untested** |
-| 5.0.x   | 3.0+ | MySQL 8 / PostgreSQL | Targeted — **untested** |
+| 7.0.1   | 3.2 | MySQL 8.0.46 | **Verified** — public CI checks out Redmine 7.0.1 (Rails 8.1.3.1), installs this plugin, runs migrations, and runs MiniTest: 37 runs, 256 assertions, 0 failures, 0 errors, 0 skips |
+| 6.x     | 3.2+ | MySQL 8 / PostgreSQL | Declared — **untested** |
+| 5.1.x   | 3.1+ | MySQL 8 / PostgreSQL | Declared — **untested** |
+| 5.0.x   | 3.0+ | MySQL 8 / PostgreSQL | Declared — **untested** |
 
-The plugin declares `requires_redmine version_or_higher: '5.0'`. Do not treat catalog versions as tested cells. The demo quality harness is **one** Redmine image (7.0.1, Ruby 4.0.7, MySQL 8.0.46). MiniTest ran on 2026-09-30. Playwright last ran on 2026-09-23. Not a 5.1 / 6.x / 7.x matrix.
+The plugin declares `requires_redmine version_or_higher: '5.0'`. Only the 7.0.1 / MySQL 8.0.46 / Ruby 3.2 cell was run. PostgreSQL was not run. Other 7.0 patch releases were not run. Do not treat the 5.x and 6.x rows as tested.
 
 ## Screenshot
 
@@ -94,37 +94,51 @@ The Overdue card opens the filtered issue list:
 
 ![Plugin listed under Administration → Plugins](screenshots/admin-plugins.png)
 
-Screenshot refresh lives in the private `redmineshop/redmineshop` harness. A public clone cannot run it.
+These screenshots were not regenerated for the public CI job.
 
 ## Tests
 
-Unit + functional tests live under `test/` (MiniTest):
+MiniTest lives under `test/`. It covers:
+
+- KPI counts: open, resolved in the period, overdue, in progress, and due soon
+- Period windows of 7, 30, and 90 days, including the rendered 7 vs 30 day counts
+- Project isolation: other projects, subprojects, and private projects
+- Private issues hidden from a viewer who cannot open them, and still counted for a viewer who can
+- Permission denial, a disabled Custom Dashboard module, a missing project, and anonymous redirect
+- Drill-down links stay on this project and use Redmine's supported issue-query operators
+- Period values outside `7`, `30`, and `90` are not interpolated into SQL
+- Assignee names are HTML-escaped
+- Only `GET` index is routed, and the page does not create or update records
+
+Public CI (`.github/workflows/ci.yml`) has two jobs:
+
+- Ruby syntax (`ruby -c`) and `test/standalone/dashboard_stats_standalone_test.rb` on Ruby 3.2 and 3.3. That job does not boot Redmine.
+- Redmine 7.0.1 with a MySQL 8.0.46 service. The job checks the plugin out into `plugins/redmine_custom_dashboard`, runs `db:migrate` and `redmine:plugins:migrate`, then `rake redmine:plugins:test NAME=redmine_custom_dashboard`.
+
+On 2026-10-06 that MiniTest job passed on Redmine 7.0.1, Ruby 3.2.3, Rails 8.1.3.1, MySQL 8.0.46:
+
+```text
+37 runs, 256 assertions, 0 failures, 0 errors, 0 skips
+```
+
+On a Redmine install that already has this plugin:
 
 ```bash
 bundle exec rake redmine:plugins:test NAME=redmine_custom_dashboard RAILS_ENV=test
 ```
 
-On the private `redmineshop/redmineshop` demo stack (not this public clone):
+This plugin does not add tables. `redmine:plugins:migrate` is still run in CI and does nothing.
 
-```bash
-PLUGIN_NAME=redmine_custom_dashboard ./demo/scripts/run-sso-plugin-tests.sh
-```
-
-Public CI (`.github/workflows/ci.yml`) runs Ruby syntax (`ruby -c`) and `test/standalone/dashboard_stats_standalone_test.rb` (period whitelist and in-progress label matching) on Ruby 3.2 and 3.3. It does not boot Redmine. That is not the MiniTest or Playwright bar.
-
-### Quality harness (demo + E2E)
-
-E2E lives in the **private** `redmineshop/redmineshop` harness (`docker-compose.demo.yml` + Playwright). This public GitHub repo is the plugin only — it does not ship that compose file, and a public clone cannot open private harness docs.
-
-Install and smoke this plugin on your own Redmine: [custom dashboard install](https://redmineshop.com/docs/custom-dashboard-install).
+This repository does not include a browser end-to-end run. Playwright last ran on 2026-09-23 (Dashboard tab, KPI cards, 7 vs 30 day period, overdue drill-down). That run was not repeated. Install the plugin on your own Redmine with the steps in [Installation](#installation). Notes: [custom dashboard install](https://redmineshop.com/docs/custom-dashboard-install).
 
 | Bar | Status |
 | --- | --- |
-| Automated tests beyond `ruby -c` | **Verified** — `test/unit` + `test/functional` in this repo (Playwright is a separate row) |
-| Installed + enabled on demo Redmine | **Verified** — mounted via `demo/plugins/` on the private monorepo demo stack; seed enables the module, grants `view_custom_dashboard`, and seeds KPI issues on `plugin-qa` |
-| E2E primary happy path | **Verified** — Playwright on that private harness (Dashboard tab, KPI cards, 7 vs 30 day period, overdue drill-down) |
-| UI screenshot in README | **Verified** — `screenshots/{kpi-cards,kpi-drilldown,admin-plugins}.png` from that spec (full Redmine pages). `dashboard-overview.png`, `assignee-breakdown.png`, and `kpi-drilldown-overdue.png` are the same images under the older names. |
-| Redmine 5.1 / 6.x matrix | **Declared / untested** — demo harness on 2026-09-30 was Redmine 7.0.1 + Ruby 4.0.7 + MySQL 8.0.46 only, not a QA matrix |
+| MiniTest on Redmine 7.0.1 + MySQL 8 | **Verified** — public CI, Ruby 3.2.3, Rails 8.1.3.1, MySQL 8.0.46: 37 runs, 256 assertions, 0 failures, 0 errors, 0 skips |
+| Redmine 5.x / 6.x | **Declared / untested** |
+| PostgreSQL | **Not run** |
+| Playwright / browser end-to-end | **Not in this repository.** Last run 2026-09-23. Not run again for this CI job |
+| README screenshots | **Present** — `screenshots/kpi-cards.png`, `screenshots/kpi-drilldown.png`, and `screenshots/admin-plugins.png`. Not regenerated for the public CI job. `dashboard-overview.png` and `assignee-breakdown.png` are the same image as `kpi-cards.png`. `kpi-drilldown-overdue.png` is the same image as `kpi-drilldown.png` |
+| Live demo install | **Not re-checked** for this CI job |
 
 ## Community support
 

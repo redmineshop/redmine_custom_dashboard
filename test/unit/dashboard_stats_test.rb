@@ -8,6 +8,9 @@ class DashboardStatsTest < ActiveSupport::TestCase
            :enabled_modules
 
   def setup
+    @previous_user = User.current
+    @manager = User.find(2)
+    User.current = @manager
     @project = Project.find(1)
     EnabledModule.create!(project: @project, name: 'custom_dashboard') unless @project.module_enabled?(:custom_dashboard)
 
@@ -24,6 +27,10 @@ class DashboardStatsTest < ActiveSupport::TestCase
     @priority = IssuePriority.first
     @author = User.find(1)
     @today = Date.new(2026, 7, 18)
+  end
+
+  def teardown
+    User.current = @previous_user
   end
 
   def create_issue!(attrs)
@@ -309,6 +316,107 @@ class DashboardStatsTest < ActiveSupport::TestCase
     assert row
     assert_equal 1, row[:in_progress]
     assert_equal 0, row[:resolved]
+  end
+
+  def test_period_param_is_not_interpolated_into_sql
+    attack = "30') OR 1=1 --"
+    stats = RedmineCustomDashboard::DashboardStats.new(
+      @project,
+      period: attack,
+      today: @today,
+      user: @manager
+    )
+    sql = [
+      stats.send(:open_scope),
+      stats.send(:resolved_in_period_scope),
+      stats.send(:overdue_scope),
+      stats.send(:due_soon_scope)
+    ].map(&:to_sql).join("\n")
+
+    assert_not_includes sql, attack
+    assert_not_includes sql, 'OR 1=1'
+    assert_equal '30', stats.call.period_key
+    assert_equal @today - 30.days, stats.call.from_date
+  end
+
+  def test_subproject_and_other_project_issues_stay_out
+    child = Project.find(3)
+    other = Project.find(2)
+    create_issue!(status: @new, assigned_to: @alice)
+    create_on!(child, subject: 'Child project open')
+    create_on!(other, subject: 'Private project open')
+
+    stats = RedmineCustomDashboard::DashboardStats.new(
+      @project, period: '30', today: @today, user: @manager
+    ).call
+    assert_equal 1, stats.open
+    assert_equal 1, Issue.where(project_id: child.id, subject: 'Child project open').count
+    assert_equal 1, Issue.where(project_id: other.id, subject: 'Private project open').count
+  end
+
+  def test_private_issues_follow_the_viewer
+    create_issue!(status: @new, assigned_to: @alice)
+    hidden = create_issue!(
+      status: @new,
+      assigned_to: @alice,
+      due_date: @today - 1.day,
+      author: @author
+    )
+    Issue.where(id: hidden.id).update_all(is_private: true)
+    hidden.reload
+
+    developer = User.find(3)
+    assert_equal 'default', developer.roles_for_project(@project).first.issues_visibility
+    assert_not hidden.visible?(developer)
+    assert hidden.visible?(@manager)
+
+    as_developer = RedmineCustomDashboard::DashboardStats.new(
+      @project, period: '30', today: @today, user: developer
+    ).call
+    assert_equal 1, as_developer.open
+    assert_equal 0, as_developer.overdue
+    assert_equal 0, as_developer.delta_overdue
+    assert_nil as_developer.assignee_stats.find { |row| row[:user]&.id == @alice.id && row[:overdue] == 1 }
+
+    as_manager = RedmineCustomDashboard::DashboardStats.new(
+      @project, period: '30', today: @today, user: @manager
+    ).call
+    assert_equal 2, as_manager.open
+    assert_equal 1, as_manager.overdue
+    assert_equal 1, as_manager.delta_overdue
+  end
+
+  def test_non_member_sees_no_rows_on_a_private_project
+    private_project = Project.find(2)
+    outsider = User.find(3)
+    assert_not private_project.is_public?
+    assert_not outsider.member_of?(private_project)
+    create_on!(private_project, subject: 'Hidden private project issue')
+
+    stats = RedmineCustomDashboard::DashboardStats.new(
+      private_project, period: '30', today: @today, user: outsider
+    ).call
+    assert_equal 0, stats.open
+    assert_equal 0, stats.resolved_in_period
+    assert_equal 0, stats.overdue
+    assert_equal [], stats.assignee_stats
+  end
+
+  def create_on!(project, attrs = {})
+    previous = User.current
+    User.current = @author
+    Issue.create!(
+      {
+        project: project,
+        tracker: project.trackers.first,
+        author: @author,
+        priority: @priority,
+        subject: "Other #{SecureRandom.hex(4)}",
+        status: @new
+      }.merge(attrs)
+    )
+  ensure
+    User.current = previous
   end
 end
 

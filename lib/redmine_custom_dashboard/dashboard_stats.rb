@@ -49,20 +49,26 @@ module RedmineCustomDashboard
       !normalized.empty? && labels.include?(normalized)
     end
 
-    def initialize(project, period: DEFAULT_PERIOD, today: Date.current)
+    def initialize(project, period: DEFAULT_PERIOD, today: Date.current, user: nil)
       @project = project
       @period_key = self.class.normalize_period(period)
       @period_days = PERIODS[@period_key]
       @today = today
       @from_date = @today - @period_days.days
       @to_date = @today
+      @user = user || (defined?(User) ? User.current : nil)
     end
 
     def call
       current = raw_kpis
       # Date-based stock (overdue, due soon) is recomputed with today = period start.
       # Open and in-progress ignore @today, so those deltas stay 0 (no journal replay).
-      baseline = self.class.new(@project, period: @period_key, today: @from_date).raw_kpis
+      baseline = self.class.new(
+        @project,
+        period: @period_key,
+        today: @from_date,
+        user: @user
+      ).raw_kpis
 
       Result.new(
         period_key: @period_key,
@@ -97,8 +103,12 @@ module RedmineCustomDashboard
 
     private
 
+    # Counts stay inside this project and inside issues the viewer can see.
+    # Private issues, other projects, and projects without view_issues are excluded.
     def base_scope
-      Issue.where(project_id: @project.id)
+      return Issue.none unless @user
+
+      Issue.visible(@user).where(project_id: @project.id)
     end
 
     def open_scope

@@ -1,8 +1,6 @@
 # Screenshots — Redmine Custom Dashboard
 
-Captured by Playwright against demo Redmine.
-
-Refresh is **private-monorepo only** (`redmineshop/redmineshop` harness). A public clone of this plugin cannot run that job.
+Captured earlier against demo Redmine. Public CI does not refresh these files.
 
 Output:
 
@@ -13,4 +11,4 @@ Output:
 - `admin-plugins.png` — Administration → Plugins page (no Configure link)
 - `empty-state.png` — not captured this run (optional; the seeded project has issues)
 
-This harness covers the project Dashboard UI. It is **one** demo Redmine image, not a 5.1 / 6.x matrix.
+These files are one demo Redmine capture, not a Redmine 5.x / 6.x matrix. `empty-state.png` was not captured.

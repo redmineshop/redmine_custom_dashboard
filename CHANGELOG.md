@@ -6,7 +6,8 @@ All notable changes to this plugin.
 
 ### Changed
 
-- Public CI runs `ruby -c` and the standalone period/label checks on Ruby 3.2 and 3.3. It still does not boot Redmine.
+- Public CI checks out Redmine 7.0.1, installs this plugin, runs migrations, and runs the MiniTest suite on MySQL 8.0. Ruby syntax and the standalone period/label checks on Ruby 3.2 and 3.3 stay as a separate job.
+- KPI and assignee counts include only issues the current user can see on that project. A private issue stays out of the totals when the viewer cannot open it.
 - Community install is **GitHub-first** (`git clone https://github.com/redmineshop/redmine_custom_dashboard.git`). Email-funnel packages are no longer the documented download path.
 - README: Last maintained date, screenshots, and untested compatibility cells. Install path is GitHub clone.
 - In-progress KPI matches open statuses whose name is Redmine's default in-progress label (English `In Progress`, Vietnamese `Đang thực hiện`, plus `default_issue_status_in_progress` from installed locales), compared case-insensitively. A closed status with that name is not counted.
@@ -15,11 +16,11 @@ All notable changes to this plugin.
 
 ### Added
 
-- Plugin quality harness on the RedmineShop demo stack: Playwright E2E for the project Dashboard tab, KPI cards, period filter, and overdue drill-down, plus README screenshots.
+- Tests for open / resolved / overdue counts, 7 vs 30 day periods, permission and module denial, project isolation, drill-down links, and HTML escaping of assignee names.
 
 ### Notes
 
-- Do not treat the harness as a Redmine 5.1 / 6.x matrix.
+- Redmine 5.x and 6.x stay declared and untested. Playwright was not run again. Screenshot files were not regenerated.
 
 ## [1.1.0] — 2026-07-18
 

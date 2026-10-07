@@ -9,7 +9,8 @@ class CustomDashboardsController < ApplicationController
   def index
     @stats = RedmineCustomDashboard::DashboardStats.new(
       @project,
-      period: params[:period]
+      period: params[:period],
+      user: User.current
     ).call
   end
 end
